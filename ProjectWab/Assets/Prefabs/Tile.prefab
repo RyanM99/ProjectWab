@@ -202,6 +202,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e67588e4d909537419e66ef27b5569cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isWalkable: 1
+  GrassSprite: {fileID: 21300000, guid: 1b352dd99a3dfaa4ab8c8274d305627d, type: 3}
 --- !u!222 &2761935263912287147
 CanvasRenderer:
   m_ObjectHideFlags: 0

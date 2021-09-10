@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class WorldGeneration : MonoBehaviour
 {
-    static public int rows = 16;
-    static public int columns = 16;
+    public int rows = 16;
+    public int columns = 16;
     static public int tileSize = 16;
 
-    public Sprite GrassSprite;
     public GameObject TilePrefab;
+    public GameObject Camera;
 
     // Start is called before the first frame update
     void Start()
@@ -23,12 +23,15 @@ public class WorldGeneration : MonoBehaviour
                 Tiles[id] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity);
 
                 // Decide Tile type here
-                Tiles[id].GetComponent<SpriteRenderer>().sprite = GrassSprite;
+                Tiles[id].GetComponent<TileManager>().thisTileType = TileManager.tileType.Grass;
                 Tiles[id].GetComponentInChildren<UnityEngine.UI.Text>().text = id.ToString();
 
                 //tile.GetComponent<SpriteRenderer>().size = new Vector2(tileSize, tileSize);
             }
         }
+
+        Camera.transform.position = new Vector3(columns / 2, -rows / 2, -10);
+
     }
 
     // Update is called once per frame

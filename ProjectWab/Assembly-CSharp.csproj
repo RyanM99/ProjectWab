@@ -54,8 +54,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\WorldGeneration.cs" />
+    <Compile Include="Assets\Scripts\CameraControls.cs" />
     <Compile Include="Assets\Scripts\TileManager.cs" />
-    <Compile Include="Assets\CameraControls.cs" />
+    <Compile Include="Assets\AIController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
