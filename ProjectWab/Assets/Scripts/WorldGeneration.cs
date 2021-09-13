@@ -10,19 +10,21 @@ public class WorldGeneration : MonoBehaviour
 
     public GameObject TilePrefab;
     public GameObject Camera;
+    public GameObject[] Tiles;
 
     // Start is called before the first frame update
     void Start()
     {
-        GameObject[] Tiles = new GameObject[rows * columns];
+        Tiles = new GameObject[rows * columns];
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
             {
                 int id = j + i * columns;
-                Tiles[id] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity);
+                Tiles[id] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity, GameObject.Find("Tiles").transform);
 
                 // Decide Tile type here
+                Tiles[id].name = "Tile "  + (id).ToString();
                 Tiles[id].GetComponent<TileManager>().thisTileType = TileManager.tileType.Grass;
                 Tiles[id].GetComponentInChildren<UnityEngine.UI.Text>().text = id.ToString();
 

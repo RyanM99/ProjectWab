@@ -55,8 +55,9 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\WorldGeneration.cs" />
     <Compile Include="Assets\Scripts\CameraControls.cs" />
-    <Compile Include="Assets\Scripts\TileManager.cs" />
     <Compile Include="Assets\AIController.cs" />
+    <Compile Include="Assets\Scripts\TileManager.cs" />
+    <Compile Include="Assets\PlayerController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
