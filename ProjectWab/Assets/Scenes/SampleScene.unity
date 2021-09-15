@@ -282,9 +282,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 406be2e8f5ab4a349b3e9d8bf8dba7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 32
-  columns: 32
-  TilePrefab: {fileID: 2983406378477675839, guid: bb73e37f1867b234ab38b4175686dc6d, type: 3}
+  rows: 128
+  columns: 128
+  WorldGenIterations: 4
+  RiverScale: 16
+  GrassTilePrefab: {fileID: 6306658032276083703, guid: 16abb6c90dc17da469c67930c7069793, type: 3}
+  WaterTilePrefab: {fileID: 9058161041122731367, guid: be2e02b462ed75542838184cfeb79e8b, type: 3}
   Camera: {fileID: 519420028}
   Tiles: []
 --- !u!4 &970912775
