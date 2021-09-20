@@ -282,7 +282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 406be2e8f5ab4a349b3e9d8bf8dba7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 128
+  rows: 512
   columns: 128
   WorldGenIterations: 4
   RiverScale: 16

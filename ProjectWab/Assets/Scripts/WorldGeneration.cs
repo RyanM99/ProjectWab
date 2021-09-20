@@ -42,7 +42,7 @@ public class WorldGeneration : MonoBehaviour
 
         // I'm generating landscape stuff here, after a field has already been made
         // dont know if thats the best way to do it, but it seemed easy enough so i did it
-        generatenewriver();
+        GenerateRiver();
 
         Camera.transform.position = new Vector3(columns / 2, -rows / 2, -10);
         Camera.GetComponent<Camera>().orthographicSize = 17;
@@ -60,63 +60,6 @@ public class WorldGeneration : MonoBehaviour
         
     }
 
-    void GenerateRiver()
-    {
-        // Determine start location
-        // In future iterations, should prefer higher altitude locations,, then should also not enter both sides of the screen
-        int RiverStart = Random.Range(0, Tiles.Length);
-        ConvertTileTo(RiverStart, WaterTilePrefab);
-
-        // North-South or East-West
-        int direction = Random.Range(0, 2);
-        //int width = Random.Range(1, 4);
-        int currentTile = RiverStart;
-
-        switch (direction)
-        {
-            case 0:
-                while (currentTile + columns < Tiles.Length)
-                {
-                    currentTile = currentTile + columns;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
-                    if (Random.Range(0,100) < 5)
-                    {
-                        if (currentTile % columns != 0 && currentTile % columns != columns - 1)
-                        {
-                            currentTile += Random.Range(-1, 2);
-                        }
-                    }
-                }
-
-                currentTile = RiverStart;
-
-                while (currentTile - columns >= 0)
-                {
-                    currentTile = currentTile - columns;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
-
-                }
-                break;
-
-            case 1:
-                while ((currentTile + 1) % columns != 0 && currentTile + 1 < Tiles.Length)
-                {
-                    currentTile++;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
-                }
-
-                currentTile = RiverStart;
-
-                while ((currentTile - 1) % columns != columns - 1 && currentTile - 1 >= 0)
-                {
-                    currentTile--;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
-                }
-                break;
-        }
-    }
-
-
     void ConvertTileTo(int id, GameObject Prefab)
     {
         GameObject NewTile = Instantiate(Prefab, Tiles[id].transform.position, Quaternion.identity, GameObject.Find("Tiles").transform);
@@ -131,15 +74,19 @@ public class WorldGeneration : MonoBehaviour
         Tiles[id] = NewTile;
     }
 
-    void generatenewriver()
+    void GenerateRiver()
     {
         // this is a test function for generating meanders in the river by encouraging the river to divert from the overall direction
+        // Currently only functions along the x-axis, needs to function along y as well and then needs funtionality for changing directions
+
+        // Starting location of the river,, currently only on the x-axis
         int xValue = 64;
-        //ConvertTileTo(xValue, WaterTilePrefab);
         int currentTile = xValue;
         bool MeanderLeft;
+
+
         // highly complex left or right generator :)
-        switch (Random.Range(0,2))
+        switch (Random.Range(0, 2))
         {
             case 0:
                 MeanderLeft = true;
@@ -152,15 +99,17 @@ public class WorldGeneration : MonoBehaviour
                 break;
         }
 
+        // River Generation Loop
         while (currentTile + columns < Tiles.Length)
         {
-            int DistanceFromCentre = Mathf.Abs((currentTile % columns) - xValue);
+            // Calculate the current tiles distance from the central axis of the river
+            int DistanceFromCentre = (currentTile % columns) - xValue;
 
             if (MeanderLeft)
             {
-                if (DistanceFromCentre > RiverScale / 2)
+                if (Mathf.Abs(DistanceFromCentre) > RiverScale / 2)
                 {
-                    if (Random.Range(0, 10) < 6)
+                    if (Random.Range(0, 10) < 4)
                     {
                         currentTile--;
                         ConvertTileTo(currentTile, WaterTilePrefab);
@@ -171,12 +120,12 @@ public class WorldGeneration : MonoBehaviour
                     currentTile--;
                     ConvertTileTo(currentTile, WaterTilePrefab);
                 }
-                if (DistanceFromCentre < RiverScale / 3)
+                if (Mathf.Abs(DistanceFromCentre) < RiverScale / 3)
                 {
                     currentTile--;
                     ConvertTileTo(currentTile, WaterTilePrefab);
                 }
-                if (DistanceFromCentre < RiverScale / 8)
+                if (Mathf.Abs(DistanceFromCentre) < RiverScale / 8)
                 {
                     currentTile--;
                     ConvertTileTo(currentTile, WaterTilePrefab);
@@ -186,9 +135,9 @@ public class WorldGeneration : MonoBehaviour
             }
             else
             {
-                if (DistanceFromCentre > RiverScale / 2)
+                if (Mathf.Abs(DistanceFromCentre) > RiverScale / 2)
                 {
-                    if (Random.Range(0, 10) < 6)
+                    if (Random.Range(0, 10) < 4)
                     {
                         currentTile++;
                         ConvertTileTo(currentTile, WaterTilePrefab);
@@ -200,12 +149,12 @@ public class WorldGeneration : MonoBehaviour
                     ConvertTileTo(currentTile, WaterTilePrefab);
                 }
                 ConvertTileTo(currentTile, WaterTilePrefab);
-                if (DistanceFromCentre < RiverScale / 3)
+                if (Mathf.Abs(DistanceFromCentre) < RiverScale / 3)
                 {
                     currentTile++;
                     ConvertTileTo(currentTile, WaterTilePrefab);
                 }
-                if (DistanceFromCentre < RiverScale / 8)
+                if (Mathf.Abs(DistanceFromCentre) < RiverScale / 8)
                 {
                     currentTile++;
                     ConvertTileTo(currentTile, WaterTilePrefab);
@@ -213,19 +162,22 @@ public class WorldGeneration : MonoBehaviour
                 currentTile = currentTile + columns;
                 ConvertTileTo(currentTile, WaterTilePrefab);
             }
-            
-            if (Random.Range(0, RiverScale) < DistanceFromCentre)
+
+            // Update distance from centre
+            //DistanceFromCentre = (currentTile % columns) - xValue;
+
+            // Determine when the river should meander in the other direction
+            if (Random.Range(0, RiverScale * 10) < RiverScale)
             {
-                if (MeanderLeft && (currentTile % columns) - xValue < -2 * RiverScale / 3)
+                if (MeanderLeft && DistanceFromCentre < -2 * RiverScale / 3)
                 {
                     MeanderLeft = false;
                 }
-                else if (!MeanderLeft && (currentTile % columns) - xValue > 2 * RiverScale / 3)
+                else if (!MeanderLeft && DistanceFromCentre > 2 * RiverScale / 3)
                 {
                     MeanderLeft = true;
                 }
             }
-
         }
     }
 }
