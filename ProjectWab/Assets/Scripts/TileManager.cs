@@ -6,6 +6,9 @@ public class TileManager : MonoBehaviour
 {
     public bool isWalkable = true;
     public Sprite Sprite;
+    public int X;
+    public int Y;
+    public int id;
 
 
     // Start is called before the first frame update

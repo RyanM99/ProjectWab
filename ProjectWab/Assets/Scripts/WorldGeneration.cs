@@ -17,24 +17,25 @@ public class WorldGeneration : MonoBehaviour
 
 
     public GameObject Camera;
-    public GameObject[] Tiles;
+    public GameObject[,] Tiles;
 
     // Start is called before the first frame update
     void Start()
     {
         // Generating a basic map of just grass tiles
-        Tiles = new GameObject[rows * columns];
-        for (int i = 0; i < rows; i++)
+        Tiles = new GameObject[columns, rows];
+        for (int y = 0; y < rows; y++)
         {
-            for (int j = 0; j < columns; j++)
+            for (int x = 0; x < columns; x++)
             {
-                int id = j + i * columns;
-                Tiles[id] = Instantiate(GrassTilePrefab, new Vector2(j, -i), Quaternion.identity, GameObject.Find("Tiles").transform);
-
-                Tiles[id].name = "Tile "  + (id).ToString();
-                if (Tiles[id].GetComponentInChildren<UnityEngine.UI.Text>())
+                Tiles[x,y] = Instantiate(GrassTilePrefab, new Vector2(x, -y), Quaternion.identity, GameObject.Find("Tiles").transform);
+                Tiles[x,y].name = "Tile "  + x.ToString() + ", " + y.ToString();
+                Tiles[x, y].GetComponent<TileManager>().X = x;
+                Tiles[x, y].GetComponent<TileManager>().Y = y;
+                Tiles[x, y].GetComponent<TileManager>().id = (columns * y) + x;
+                if (Tiles[x,y].GetComponentInChildren<UnityEngine.UI.Text>())
                 {
-                    Tiles[id].GetComponentInChildren<UnityEngine.UI.Text>().text = id.ToString();
+                    Tiles[x,y].GetComponentInChildren<UnityEngine.UI.Text>().text = Tiles[x, y].GetComponent<TileManager>().id.ToString()/*x.ToString() + ", " + y.ToString()*/;
                 }
                 
             }
@@ -42,7 +43,7 @@ public class WorldGeneration : MonoBehaviour
 
         // I'm generating landscape stuff here, after a field has already been made
         // dont know if thats the best way to do it, but it seemed easy enough so i did it
-        GenerateRiver();
+        //GenerateRiver();
 
         Camera.transform.position = new Vector3(columns / 2, -rows / 2, -10);
         Camera.GetComponent<Camera>().orthographicSize = 17;
@@ -60,18 +61,24 @@ public class WorldGeneration : MonoBehaviour
         
     }
 
-    void ConvertTileTo(int id, GameObject Prefab)
+    void ConvertTileTo(int x, int y, GameObject Prefab)
     {
-        GameObject NewTile = Instantiate(Prefab, Tiles[id].transform.position, Quaternion.identity, GameObject.Find("Tiles").transform);
-        string NewTileName = Tiles[id].name;
-        if (NewTile.GetComponentInChildren<UnityEngine.UI.Text>())
+        if (x < Tiles.GetLength(0) && x >= 0 && y < Tiles.GetLength(1) && y >= 0)
         {
-            NewTile.GetComponentInChildren<UnityEngine.UI.Text>().text = id.ToString();
-        }
+            GameObject NewTile = Instantiate(Prefab, Tiles[x, y].transform.position, Quaternion.identity, GameObject.Find("Tiles").transform);
+            string NewTileName = Tiles[x, y].name;
+            NewTile.GetComponent<TileManager>().X = x;
+            NewTile.GetComponent<TileManager>().Y = y;
+            NewTile.GetComponent<TileManager>().id = Tiles[x, y].GetComponent<TileManager>().id;
+            if (NewTile.GetComponentInChildren<UnityEngine.UI.Text>())
+            {
+                NewTile.GetComponentInChildren<UnityEngine.UI.Text>().text = NewTile.GetComponent<TileManager>().id.ToString()/*x.ToString() + ", " + y.ToString()*/;
+            }
 
-        Destroy(Tiles[id]);
-        NewTile.name = NewTileName;
-        Tiles[id] = NewTile;
+            Destroy(Tiles[x, y]);
+            NewTile.name = NewTileName;
+            Tiles[x, y] = NewTile;
+        }
     }
 
     void GenerateRiver()
@@ -80,8 +87,10 @@ public class WorldGeneration : MonoBehaviour
         // Currently only functions along the x-axis, needs to function along y as well and then needs funtionality for changing directions
 
         // Starting location of the river,, currently only on the x-axis
-        int xValue = 64;
-        int currentTile = xValue;
+        int xValue = columns / 2;
+        GameObject currentTile = Tiles[xValue, 0];
+        int currentTileX = currentTile.GetComponent<TileManager>().X;
+        int currentTileY = currentTile.GetComponent<TileManager>().Y;
         bool MeanderLeft;
 
 
@@ -100,10 +109,10 @@ public class WorldGeneration : MonoBehaviour
         }
 
         // River Generation Loop
-        while (currentTile + columns < Tiles.Length)
+        while (currentTileX < Tiles.GetLength(0) && currentTileX >= 0 && currentTileY < Tiles.GetLength(1) && currentTileY >= 0)
         {
             // Calculate the current tiles distance from the central axis of the river
-            int DistanceFromCentre = (currentTile % columns) - xValue;
+            int DistanceFromCentre = currentTileX - xValue;
 
             if (MeanderLeft)
             {
@@ -111,27 +120,27 @@ public class WorldGeneration : MonoBehaviour
                 {
                     if (Random.Range(0, 10) < 4)
                     {
-                        currentTile--;
-                        ConvertTileTo(currentTile, WaterTilePrefab);
+                        currentTileX--;
+                        ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                     }
                 }
                 else
                 {
-                    currentTile--;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
+                    currentTileX--;
+                    ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 }
                 if (Mathf.Abs(DistanceFromCentre) < RiverScale / 3)
                 {
-                    currentTile--;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
+                    currentTileX--;
+                    ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 }
                 if (Mathf.Abs(DistanceFromCentre) < RiverScale / 8)
                 {
-                    currentTile--;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
+                    currentTileX--;
+                    ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 }
-                currentTile = currentTile + columns;
-                ConvertTileTo(currentTile, WaterTilePrefab);
+                currentTileY++;
+                ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
             }
             else
             {
@@ -139,35 +148,35 @@ public class WorldGeneration : MonoBehaviour
                 {
                     if (Random.Range(0, 10) < 4)
                     {
-                        currentTile++;
-                        ConvertTileTo(currentTile, WaterTilePrefab);
+                        currentTileX++;
+                        ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                     }
                 }
                 else
                 {
-                    currentTile++;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
+                    currentTileX++;
+                    ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 }
-                ConvertTileTo(currentTile, WaterTilePrefab);
+                ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 if (Mathf.Abs(DistanceFromCentre) < RiverScale / 3)
                 {
-                    currentTile++;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
+                    currentTileX++;
+                    ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 }
                 if (Mathf.Abs(DistanceFromCentre) < RiverScale / 8)
                 {
-                    currentTile++;
-                    ConvertTileTo(currentTile, WaterTilePrefab);
+                    currentTileX++;
+                    ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
                 }
-                currentTile = currentTile + columns;
-                ConvertTileTo(currentTile, WaterTilePrefab);
+                currentTileY++;
+                ConvertTileTo(currentTileX, currentTileY, WaterTilePrefab);
             }
 
             // Update distance from centre
-            //DistanceFromCentre = (currentTile % columns) - xValue;
+            DistanceFromCentre = currentTileX - xValue;
 
             // Determine when the river should meander in the other direction
-            if (Random.Range(0, RiverScale * 10) < RiverScale)
+            if (Random.Range(0, RiverScale * RiverScale) - Mathf.Abs(DistanceFromCentre) < RiverScale)
             {
                 if (MeanderLeft && DistanceFromCentre < -2 * RiverScale / 3)
                 {

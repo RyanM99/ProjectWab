@@ -6,6 +6,7 @@ public class CameraControls : MonoBehaviour
 {
     public GameObject GameManager;
     public float CameraSpeed = .2f;
+    public float CameraMaxSpeed = 10f;
     public float ZoomSpeed = .2f;
 
     // Start is called before the first frame update
@@ -17,21 +18,23 @@ public class CameraControls : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        float CameraPanSpeed = CameraSpeed * GetComponent<Camera>().orthographicSize / 10 > CameraMaxSpeed ? CameraMaxSpeed : CameraSpeed * GetComponent<Camera>().orthographicSize / 10;
+
         if (Input.GetKey("d"))
         {
-            transform.SetPositionAndRotation(new Vector3(transform.position.x + CameraSpeed * GetComponent<Camera>().orthographicSize / 10, transform.position.y, transform.position.z), transform.rotation);
+            transform.SetPositionAndRotation(new Vector3(transform.position.x + CameraPanSpeed, transform.position.y, transform.position.z), transform.rotation);
         }
         if (Input.GetKey("a"))
         {
-            transform.SetPositionAndRotation(new Vector3(transform.position.x - CameraSpeed * GetComponent<Camera>().orthographicSize / 10, transform.position.y, transform.position.z), transform.rotation);
+            transform.SetPositionAndRotation(new Vector3(transform.position.x - CameraPanSpeed, transform.position.y, transform.position.z), transform.rotation);
         }
         if (Input.GetKey("w"))
         {
-            transform.SetPositionAndRotation(new Vector3(transform.position.x, transform.position.y + CameraSpeed * GetComponent<Camera>().orthographicSize / 10, transform.position.z), transform.rotation);
+            transform.SetPositionAndRotation(new Vector3(transform.position.x, transform.position.y + CameraPanSpeed, transform.position.z), transform.rotation);
         }
         if (Input.GetKey("s"))
         {
-            transform.SetPositionAndRotation(new Vector3(transform.position.x, transform.position.y - CameraSpeed * GetComponent<Camera>().orthographicSize / 10, transform.position.z), transform.rotation);
+            transform.SetPositionAndRotation(new Vector3(transform.position.x, transform.position.y - CameraPanSpeed, transform.position.z), transform.rotation);
         }
 
 
