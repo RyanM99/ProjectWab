@@ -43,7 +43,7 @@ public class WorldGeneration : MonoBehaviour
 
         // I'm generating landscape stuff here, after a field has already been made
         // dont know if thats the best way to do it, but it seemed easy enough so i did it
-        //GenerateRiver();
+        GenerateRiver();
 
         Camera.transform.position = new Vector3(columns / 2, -rows / 2, -10);
         Camera.GetComponent<Camera>().orthographicSize = 17;

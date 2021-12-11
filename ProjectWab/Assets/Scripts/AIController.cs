@@ -9,6 +9,7 @@ public class AIController : MonoBehaviour
     public GameObject CurrentTile;
     public GameObject TargetTile;
     public GameObject NextTile;
+    bool unreachableGoal = false;
     public GameObject[,] TileMap;
     GameObject GoalTile;
     List<GameObject> Pathing = new List<GameObject>();
@@ -68,6 +69,13 @@ public class AIController : MonoBehaviour
         if (NextTile == null)
         {
             NextTile = Pathing[0];
+        }
+
+        if (unreachableGoal)
+        {
+            unreachableGoal = false;
+            TargetTile = TileMap[Random.Range(0, TileMap.GetLength(0)), Random.Range(0, TileMap.GetLength(1))];
+            Pathfind(TargetTile.GetComponent<TileManager>().id);
         }
 
         if (transform.position == NextTile.transform.position) 
@@ -201,7 +209,8 @@ public class AIController : MonoBehaviour
             }
         }
 
-        //Debug.Log("No Path Found!");
+        Debug.Log("No Path Found!");
+        unreachableGoal = true;
 
 
     }
@@ -228,7 +237,7 @@ public class AIController : MonoBehaviour
         return possibleTiles
                             .Where(tile => tile.X >= 0 && tile.X <= maxX)
                             .Where(tile => tile.Y >= 0 && tile.Y <= maxY)
-                            //.Where(tile => TileMap[tile.X, tile.Y].GetComponent<TileManager>().isWalkable || TileMap[tile.X, tile.Y] == GoalTile)
+                            .Where(tile => TileMap[tile.X, tile.Y].GetComponent<TileManager>().isWalkable || TileMap[tile.X, tile.Y] == GoalTile)
                             .ToList();
     }
 
