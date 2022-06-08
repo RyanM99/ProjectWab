@@ -31,6 +31,15 @@ public class MapManager : MonoBehaviour
     public float GrowthInterval = 1f;
     private Dictionary<Vector3Int, CropManager> Crops = new Dictionary<Vector3Int, CropManager>();
 
+
+    // Day Night Cycle
+    public SpriteRenderer DayNightOverlay;
+    public float DayNightInterval = 10f;
+    public float DayNightAlphaMin = 5f;
+    public float DayNightAlphaMax = 150f;
+    public float DayNightAlphaGradient = 1f;
+
+
     private void Awake()
     {
         behaviourFromTiles = new Dictionary<TileBase, TileBehaviour>();
@@ -49,6 +58,7 @@ public class MapManager : MonoBehaviour
     void Start()
     {
         StartCoroutine(GrowCrops());
+        StartCoroutine(DayNightCycle());
     }
 
     // Update is called once per frame
@@ -83,7 +93,22 @@ public class MapManager : MonoBehaviour
     public void PlantSeeds(Vector2 worldPosition)
     {
         Vector3Int gridPosition = map.WorldToCell(worldPosition);
+        TileBase tileBase = map.GetTile(gridPosition);
+        TileBase tileDetails = Details.GetTile(gridPosition);
 
+        if (tileBase == null)
+            return;
+
+        if (tileDetails == Seeded && Crops.ContainsKey(gridPosition))
+        {
+            Crops[gridPosition].PlantSeeds();
+            print("seeds planted");
+        }
+    }
+
+    public void PlaceSeeds(Vector2 worldPosition)
+    {
+        Vector3Int gridPosition = map.WorldToCell(worldPosition);
         TileBase tile = map.GetTile(gridPosition);
 
         if (tile == null || !behaviourFromTiles[tile].canBeSeeded)
@@ -96,7 +121,7 @@ public class MapManager : MonoBehaviour
             newCrop.tilePos = gridPosition;
             Crops.Add(gridPosition, newCrop);
 
-            print("new crop added");
+            print("new seeds added");
         }
     }
 
@@ -117,5 +142,37 @@ public class MapManager : MonoBehaviour
 
             yield return new WaitForSeconds(GrowthInterval);
         }    
+    }
+
+    private IEnumerator DayNightCycle()
+    {
+        bool DayToNight = true;
+        while (true)
+        {
+            switch (DayToNight)
+            {
+                case true:
+                    DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a + DayNightAlphaGradient);
+                    print(DayNightOverlay.color.a);
+                    if (DayNightOverlay.color.a >= DayNightAlphaMax)
+                    {
+                        DayToNight = false;
+                        print("switch");
+                    }
+                break;
+
+                case false:
+                    DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a - DayNightAlphaGradient);
+                    print(DayNightOverlay.color.a);
+                    if (DayNightOverlay.color.a <= DayNightAlphaMin)
+                    {
+                        DayToNight = true;
+                        print("switch");
+                    }
+                    break;
+            }
+
+            yield return new WaitForSeconds(DayNightInterval);
+        }
     }
 }

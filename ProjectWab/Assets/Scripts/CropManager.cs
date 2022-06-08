@@ -17,6 +17,7 @@ public class CropManager : MonoBehaviour
     public TileBase stage2;
     public TileBase stage3;
 
+    public bool hasBeenPlanted = false;
 
     // Start is called before the first frame update
     void Start()
@@ -32,27 +33,33 @@ public class CropManager : MonoBehaviour
 
     public void Grow(float GrowthAmount)
     {
-        CurrentGrowth += GrowthAmount;
-
-        print(this + " has grown " + CurrentGrowth);
-
-        // Crop has been planted
-        if (CurrentGrowth >= GrowthTime / 10f && currentStage < 1)
+        if (hasBeenPlanted)
         {
-            mapManager.UpdateCropTiles(tilePos, stage1);
-        }
+            CurrentGrowth += GrowthAmount;
 
-        // Crop has reached maturity
-        if (CurrentGrowth >= GrowthTime / 2f && currentStage < 2)
-        {
-            mapManager.UpdateCropTiles(tilePos, stage2);
-        }
+            print(this + " has grown " + CurrentGrowth);
 
-        // Crop has reached fruition
-        if (CurrentGrowth >= GrowthTime && currentStage < 2)
-        {
-            mapManager.UpdateCropTiles(tilePos, stage3);
+            // Crop has reached maturity
+            if (CurrentGrowth >= GrowthTime / 2f && currentStage == 1)
+            {
+                mapManager.UpdateCropTiles(tilePos, stage2);
+                currentStage++;
+            }
+
+            // Crop has reached fruition
+            if (CurrentGrowth >= GrowthTime && currentStage == 2)
+            {
+                mapManager.UpdateCropTiles(tilePos, stage3);
+                currentStage++;
+            }
         }
+    }
+
+    public void PlantSeeds()
+    {
+        hasBeenPlanted = true;
+        mapManager.UpdateCropTiles(tilePos, stage1);
+        currentStage = 1;
     }
 
 

@@ -13,12 +13,15 @@ public class PlayerController : MonoBehaviour
 
     // Map
     [SerializeField]
-    private Tilemap map;
+    private Tilemap mapBase;
+    [SerializeField]
+    private Tilemap mapDetails;
     [SerializeField]
     private Tilemap UI;
     public TileBase SelectedTile;
     public TileBase tilledSoil;
     public TileBase grass;
+    public TileBase seeds;
     private Vector3Int prevTilePos;
     private MapManager mapManager;
 
@@ -27,6 +30,13 @@ public class PlayerController : MonoBehaviour
     public GameObject EquipmentSlots;
 
     public GameObject _object;
+
+
+    // Sprites
+    public Sprite NorthFacing;
+    public Sprite SouthFacing;
+    public Sprite EastFacing;
+    public Sprite WestFacing;
 
 
     // Start is called before the first frame update
@@ -56,10 +66,10 @@ public class PlayerController : MonoBehaviour
                     if (Physics2D.OverlapCircle(movePoint.position + new Vector3(Input.GetAxisRaw("Horizontal"), 0f, 0f), .2f, isWalkable) && !Physics2D.OverlapCircle(movePoint.position + new Vector3(Input.GetAxisRaw("Horizontal"), 0f, 0f), .2f, Collisions))
                     {
                         movePoint.position += new Vector3(Input.GetAxisRaw("Horizontal"), 0f, 0f);
-
-                        if (Input.GetAxisRaw("Horizontal") == 1f) { GetComponent<SpriteRenderer>().flipX = true; }
-                        if (Input.GetAxisRaw("Horizontal") == -1f) { GetComponent<SpriteRenderer>().flipX = false; }
                     }
+
+                    if (Input.GetAxisRaw("Horizontal") == 1f)   { GetComponent<SpriteRenderer>().sprite = EastFacing; }
+                    if (Input.GetAxisRaw("Horizontal") == -1f)  { GetComponent<SpriteRenderer>().sprite = WestFacing; }
                 }
 
                 if (Mathf.Abs(Input.GetAxisRaw("Vertical")) == 1f)
@@ -68,6 +78,9 @@ public class PlayerController : MonoBehaviour
                     {
                         movePoint.position += new Vector3(0f, Input.GetAxisRaw("Vertical"), 0f);
                     }
+
+                    if (Input.GetAxisRaw("Vertical") == 1f)     { GetComponent<SpriteRenderer>().sprite = NorthFacing; }
+                    if (Input.GetAxisRaw("Vertical") == -1f)    { GetComponent<SpriteRenderer>().sprite = SouthFacing; }
                 }
             }
         }
@@ -76,9 +89,9 @@ public class PlayerController : MonoBehaviour
         // Display UI
 
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int gridPosition = map.WorldToCell(mousePosition);
+        Vector3Int gridPosition = mapBase.WorldToCell(mousePosition);
 
-        if (map.GetTile(gridPosition) != SelectedTile && map.GetTile(gridPosition) != null)
+        if (mapBase.GetTile(gridPosition) != SelectedTile && mapBase.GetTile(gridPosition) != null)
         {
             UI.SetTile(prevTilePos, null);
             UI.SetTile(gridPosition, SelectedTile);
@@ -121,24 +134,29 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            TileBase clickedTile = map.GetTile(gridPosition);
+            TileBase clickedTileWorld = mapBase.GetTile(gridPosition);
+            TileBase clickedTileDetails = mapDetails.GetTile(gridPosition);
             switch (EquipmentID)
             {
                 // Hoe
                 case 1:
-                    if (clickedTile == grass)
+                    if (clickedTileWorld == grass)
                     {
-                        map.SetTile(gridPosition, tilledSoil);
+                        mapBase.SetTile(gridPosition, tilledSoil);
                     }
                     break;
 
                 // Seeds
                 case 2:
-                    mapManager.PlantSeeds(mousePosition);
+                    mapManager.PlaceSeeds(mousePosition);
                     break;
 
                 // Fertiliser Spell
                 case 3:
+                    if (clickedTileDetails == seeds)
+                    {
+                        mapManager.PlantSeeds(mousePosition);
+                    }
                     break;
             }
 
