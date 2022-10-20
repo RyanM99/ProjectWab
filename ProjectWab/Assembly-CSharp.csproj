@@ -67,7 +67,7 @@
     <Compile Include="Assets\Scripts\TileManager.cs" />
     <Compile Include="Assets\Scripts\TileDataManager.cs" />
     <Compile Include="Assets\Tiles\Scripts\AdvancedRuleTile.cs" />
-    <Compile Include="Assets\Scripts\empty.cs" />
+    <Compile Include="Assets\Scripts\ItemSlotData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

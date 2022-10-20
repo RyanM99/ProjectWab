@@ -28,9 +28,9 @@ public class PlayerController : MonoBehaviour
     // Equipment
     public int EquipmentID;
     public GameObject EquipmentSlots;
-
     public GameObject _object;
-
+    public GameObject fertiliserCone;
+    public GameObject pivot;
 
     // Sprites
     public Sprite NorthFacing;
@@ -94,12 +94,16 @@ public class PlayerController : MonoBehaviour
         if (mapBase.GetTile(gridPosition) != SelectedTile && mapBase.GetTile(gridPosition) != null)
         {
             UI.SetTile(prevTilePos, null);
-            UI.SetTile(gridPosition, SelectedTile);
             prevTilePos = gridPosition;
+            if (EquipmentSlots.transform.GetChild(EquipmentID - 1).GetComponent<ItemSlotData>().shouldShowSelectedTile)
+            {
+                UI.SetTile(gridPosition, SelectedTile);
+            }
         }
 
 
-        // Controls
+        /////////////////// Controls
+
 
         // Selecting Equipment
         if (Input.GetKeyDown("1"))
@@ -129,13 +133,24 @@ public class PlayerController : MonoBehaviour
             }
             EquipmentSlots.transform.GetChild(EquipmentID - 1).transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         }
+        if (Input.GetKeyDown("4"))
+        {
+            EquipmentID = 4;
+            foreach (Transform child in EquipmentSlots.transform)
+            {
+                child.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            }
+            EquipmentSlots.transform.GetChild(EquipmentID - 1).transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+        }
 
 
-
+        // When mouse button is pressed
+        // Used for instantaneous actions
         if (Input.GetMouseButtonDown(0))
         {
             TileBase clickedTileWorld = mapBase.GetTile(gridPosition);
             TileBase clickedTileDetails = mapDetails.GetTile(gridPosition);
+
             switch (EquipmentID)
             {
                 // Hoe
@@ -151,7 +166,7 @@ public class PlayerController : MonoBehaviour
                     mapManager.PlaceSeeds(mousePosition);
                     break;
 
-                // Fertiliser Spell
+                // Watering Can
                 case 3:
                     if (clickedTileDetails == seeds)
                     {
@@ -159,9 +174,33 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
             }
-
-
-
         }
+
+        // While mouse button is held
+        // Used for channelled actions
+        if (Input.GetMouseButton(0))
+        {
+            switch(EquipmentID)
+            {
+                default:
+                    break;
+                case 4:
+                    if (fertiliserCone.activeSelf == false)
+                    {
+                        fertiliserCone.SetActive(true);
+
+                    }
+                    Vector3 targetDirection = new Vector3(mousePosition.x, mousePosition.y, 0f) - transform.position;
+                    pivot.transform.up = targetDirection;
+                    
+
+                    break;
+            }
+        }
+        else if (!Input.GetMouseButton(0))
+        {
+            fertiliserCone.SetActive(false);
+        }
+
     }
 }

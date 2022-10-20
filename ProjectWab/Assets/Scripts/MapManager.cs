@@ -153,21 +153,17 @@ public class MapManager : MonoBehaviour
             {
                 case true:
                     DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a + DayNightAlphaGradient);
-                    print(DayNightOverlay.color.a);
                     if (DayNightOverlay.color.a >= DayNightAlphaMax)
                     {
                         DayToNight = false;
-                        print("switch");
                     }
                 break;
 
                 case false:
                     DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a - DayNightAlphaGradient);
-                    print(DayNightOverlay.color.a);
                     if (DayNightOverlay.color.a <= DayNightAlphaMin)
                     {
                         DayToNight = true;
-                        print("switch");
                     }
                     break;
             }
