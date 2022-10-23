@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     public GameObject EquipmentSlots;
     public GameObject _object;
     public GameObject fertiliserCone;
+    public ParticleSystem fertiliserParticles;
     public GameObject pivot;
 
     // Sprites
@@ -185,10 +186,13 @@ public class PlayerController : MonoBehaviour
                 default:
                     break;
                 case 4:
-                    if (fertiliserCone.activeSelf == false)
+                    if (fertiliserParticles.isEmitting == false)
                     {
-                        fertiliserCone.SetActive(true);
-
+                        fertiliserParticles.Play();
+                    }
+                    //if (fertiliserCone.activeSelf == false)
+                    {
+                        //fertiliserCone.SetActive(true);
                     }
                     Vector3 targetDirection = new Vector3(mousePosition.x, mousePosition.y, 0f) - transform.position;
                     pivot.transform.up = targetDirection;
@@ -199,7 +203,12 @@ public class PlayerController : MonoBehaviour
         }
         else if (!Input.GetMouseButton(0))
         {
-            fertiliserCone.SetActive(false);
+            //fertiliserCone.SetActive(false);
+            if (fertiliserParticles.isEmitting == true)
+            {
+                fertiliserParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
+            //fertiliserParticles.Pause();
         }
 
     }
