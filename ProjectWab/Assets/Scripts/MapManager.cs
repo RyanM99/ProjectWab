@@ -89,23 +89,6 @@ public class MapManager : MonoBehaviour
 
         return walkingSpeed;
     }
-
-    public void PlantSeeds(Vector2 worldPosition)
-    {
-        Vector3Int gridPosition = map.WorldToCell(worldPosition);
-        TileBase tileBase = map.GetTile(gridPosition);
-        TileBase tileDetails = Details.GetTile(gridPosition);
-
-        if (tileBase == null)
-            return;
-
-        if (tileDetails == Seeded && Crops.ContainsKey(gridPosition))
-        {
-            Crops[gridPosition].PlantSeeds();
-            print("seeds planted");
-        }
-    }
-
     public void PlaceSeeds(Vector2 worldPosition)
     {
         Vector3Int gridPosition = map.WorldToCell(worldPosition);
@@ -125,6 +108,38 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    public void PlantSeeds(Vector2 worldPosition)
+    {
+        Vector3Int gridPosition = map.WorldToCell(worldPosition);
+        TileBase tileBase = map.GetTile(gridPosition);
+        TileBase tileDetails = Details.GetTile(gridPosition);
+
+        if (tileBase == null)
+            return;
+
+        if (tileDetails == Seeded && Crops.ContainsKey(gridPosition))
+        {
+            Crops[gridPosition].PlantSeeds();
+            print("seeds planted");
+        }
+    }
+
+    public void FertiliseSeeds(Vector2 worldPosition, float fertFactor)
+    {
+        Vector3Int gridPosition = map.WorldToCell(worldPosition);
+        TileBase tileBase = map.GetTile(gridPosition);
+        TileBase tileDetails = Details.GetTile(gridPosition);
+
+        if (tileBase == null)
+            return;
+
+        if (tileDetails != Seeded && Crops.ContainsKey(gridPosition))
+        {
+            Crops[gridPosition].fertilise(fertFactor);
+            print("growth speed increased");
+        }
+    }
+    
     public void UpdateCropTiles(Vector3Int tilePos, TileBase tile)
     {
         Details.SetTile(tilePos, tile);

@@ -190,10 +190,6 @@ public class PlayerController : MonoBehaviour
                     {
                         fertiliserParticles.Play();
                     }
-                    //if (fertiliserCone.activeSelf == false)
-                    {
-                        //fertiliserCone.SetActive(true);
-                    }
                     Vector3 targetDirection = new Vector3(mousePosition.x, mousePosition.y, 0f) - transform.position;
                     pivot.transform.up = targetDirection;
                     

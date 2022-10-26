@@ -17,6 +17,9 @@ public class CropManager : MonoBehaviour
     public TileBase stage2;
     public TileBase stage3;
 
+    public float growthFactor = 1.0f;
+    private float fertiliserFactor = 1.0f;
+
     public bool hasBeenPlanted = false;
 
     // Start is called before the first frame update
@@ -35,7 +38,7 @@ public class CropManager : MonoBehaviour
     {
         if (hasBeenPlanted)
         {
-            CurrentGrowth += GrowthAmount;
+            CurrentGrowth += GrowthAmount * growthFactor * fertiliserFactor;
 
             print(this + " has grown " + CurrentGrowth);
 
@@ -60,6 +63,11 @@ public class CropManager : MonoBehaviour
         hasBeenPlanted = true;
         mapManager.UpdateCropTiles(tilePos, stage1);
         currentStage = 1;
+    }
+
+    public void fertilise(float fertFactor)
+    {
+        fertiliserFactor = fertFactor;
     }
 
 
