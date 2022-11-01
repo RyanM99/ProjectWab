@@ -102,6 +102,7 @@ public class MapManager : MonoBehaviour
             Details.SetTile(gridPosition, Seeded);
             CropManager newCrop = Instantiate(CropPrefab);
             newCrop.tilePos = gridPosition;
+            newCrop.SetCollider();
             Crops.Add(gridPosition, newCrop);
 
             print("new seeds added");

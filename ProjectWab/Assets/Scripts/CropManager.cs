@@ -18,15 +18,18 @@ public class CropManager : MonoBehaviour
     public TileBase stage3;
 
     public float growthFactor = 1.0f;
-    private float fertiliserFactor = 1.0f;
+    private float fertiliserFactor = 10.0f;
 
     public bool hasBeenPlanted = false;
+
+    BoxCollider2D boxCollider;
 
     // Start is called before the first frame update
     void Start()
     {
         mapManager = FindObjectOfType<MapManager>();
     }
+    
 
     // Update is called once per frame
     void Update()
@@ -34,11 +37,17 @@ public class CropManager : MonoBehaviour
         
     }
 
+    private void OnParticleCollision(GameObject other)
+    {
+        CurrentGrowth += growthFactor * fertiliserFactor;
+        print("fertilised");
+    }
+
     public void Grow(float GrowthAmount)
     {
         if (hasBeenPlanted)
         {
-            CurrentGrowth += GrowthAmount * growthFactor * fertiliserFactor;
+            CurrentGrowth += GrowthAmount * growthFactor;
 
             print(this + " has grown " + CurrentGrowth);
 
@@ -63,6 +72,7 @@ public class CropManager : MonoBehaviour
         hasBeenPlanted = true;
         mapManager.UpdateCropTiles(tilePos, stage1);
         currentStage = 1;
+        this.gameObject.layer = LayerMask.NameToLayer("Crops");
     }
 
     public void fertilise(float fertFactor)
@@ -70,5 +80,12 @@ public class CropManager : MonoBehaviour
         fertiliserFactor = fertFactor;
     }
 
+    public void SetCollider()
+    {
+        boxCollider = gameObject.AddComponent<BoxCollider2D>() as BoxCollider2D;
+        boxCollider.transform.position = tilePos;
+        boxCollider.offset = new Vector2(0.5f, 0.5f);
+        //boxCollider.isTrigger = true;
+    }
 
 }
