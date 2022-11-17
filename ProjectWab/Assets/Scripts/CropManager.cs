@@ -16,9 +16,11 @@ public class CropManager : MonoBehaviour
     public TileBase stage1;
     public TileBase stage2;
     public TileBase stage3;
+    public TileBase fruitedTile;
+    bool fruited = false;
 
     public float growthFactor = 1.0f;
-    private float fertiliserFactor = 10.0f;
+    private float fertiliserFactor = 1.0f;
 
     public bool hasBeenPlanted = false;
 
@@ -40,29 +42,43 @@ public class CropManager : MonoBehaviour
     private void OnParticleCollision(GameObject other)
     {
         CurrentGrowth += growthFactor * fertiliserFactor;
-        print("fertilised");
+        //print("fertilised");
     }
+
+    //private void OnParticleTrigger()
+    //{
+    //    CurrentGrowth += growthFactor * fertiliserFactor;
+    //    print("fertilised");
+
+    //}
 
     public void Grow(float GrowthAmount)
     {
         if (hasBeenPlanted)
         {
             CurrentGrowth += GrowthAmount * growthFactor;
-
-            print(this + " has grown " + CurrentGrowth);
+            //print(this + " has grown " + CurrentGrowth);
 
             // Crop has reached maturity
-            if (CurrentGrowth >= GrowthTime / 2f && currentStage == 1)
+            if (CurrentGrowth >= GrowthTime * 0.5f && currentStage == 1)
             {
                 mapManager.UpdateCropTiles(tilePos, stage2);
                 currentStage++;
             }
 
-            // Crop has reached fruition
-            if (CurrentGrowth >= GrowthTime && currentStage == 2)
+            // Crop has fully grown
+            if (CurrentGrowth >= GrowthTime * 0.75f && currentStage == 2)
             {
                 mapManager.UpdateCropTiles(tilePos, stage3);
                 currentStage++;
+            }
+
+            // Crop has fruited
+            if (CurrentGrowth >= GrowthTime && currentStage == 3 && fruited == false)
+            {
+                //print("grow (" + this.name + ")");
+                mapManager.UpdateCropTiles(tilePos, fruitedTile);
+                fruited = true;
             }
         }
     }
@@ -88,4 +104,24 @@ public class CropManager : MonoBehaviour
         //boxCollider.isTrigger = true;
     }
 
+    public bool harvest()
+    {
+        if (fruited == true)
+        {
+            //add a fruit or something to player
+            //or return plants fruit data
+            fruited = false;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void removeCrop()
+    {
+        this.gameObject.layer = LayerMask.NameToLayer("Default");
+        Destroy(this);
+    }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     public TileBase tilledSoil;
     public TileBase grass;
     public TileBase seeds;
+    public TileBase fruitedCrop;
     private Vector3Int prevTilePos;
     private MapManager mapManager;
 
@@ -38,6 +40,11 @@ public class PlayerController : MonoBehaviour
     public Sprite SouthFacing;
     public Sprite EastFacing;
     public Sprite WestFacing;
+
+    // Inventory
+    int Wallet = 10;
+    public Text walletText;
+    int seedsCost = 2;
 
 
     // Start is called before the first frame update
@@ -102,6 +109,8 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        walletText.text = Wallet.ToString();
+
 
         /////////////////// Controls
 
@@ -143,11 +152,20 @@ public class PlayerController : MonoBehaviour
             }
             EquipmentSlots.transform.GetChild(EquipmentID - 1).transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         }
+        if (Input.GetKeyDown("5"))
+        {
+            EquipmentID = 5;
+            foreach (Transform child in EquipmentSlots.transform)
+            {
+                child.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            }
+            EquipmentSlots.transform.GetChild(EquipmentID - 1).transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+        }
 
 
-        // When mouse button is pressed
-        // Used for instantaneous actions
-        if (Input.GetMouseButtonDown(0))
+            // When mouse button is pressed
+            // Used for instantaneous actions
+            if (Input.GetMouseButtonDown(0))
         {
             TileBase clickedTileWorld = mapBase.GetTile(gridPosition);
             TileBase clickedTileDetails = mapDetails.GetTile(gridPosition);
@@ -164,7 +182,13 @@ public class PlayerController : MonoBehaviour
 
                 // Seeds
                 case 2:
-                    mapManager.PlaceSeeds(mousePosition);
+                    if (Wallet >= seedsCost)
+                    {
+                        if (mapManager.PlaceSeeds(mousePosition))
+                        {
+                            Wallet -= seedsCost;
+                        }
+                    }
                     break;
 
                 // Watering Can
@@ -174,6 +198,14 @@ public class PlayerController : MonoBehaviour
                         mapManager.PlantSeeds(mousePosition);
                     }
                     break;
+                // Harvesting Scythe
+                case 5:
+                    if (clickedTileDetails == fruitedCrop)
+                    {
+                        mapManager.Harvest(mousePosition);
+                        //print("harvesting");
+                    }
+                        break;
             }
         }
 
@@ -207,5 +239,15 @@ public class PlayerController : MonoBehaviour
             //fertiliserParticles.Pause();
         }
 
+    }
+
+    public void incMoney()
+    {
+        Wallet++;
+    }
+
+    public void incMoney(int amount)
+    {
+        Wallet += amount;
     }
 }

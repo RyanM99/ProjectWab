@@ -39,6 +39,13 @@ public class MapManager : MonoBehaviour
     public float DayNightAlphaMax = 150f;
     public float DayNightAlphaGradient = 1f;
 
+    float nightimePercentage = .5f;
+    public GameObject clockHand;
+
+
+    // Player
+    PlayerController playerController;
+
 
     private void Awake()
     {
@@ -59,6 +66,8 @@ public class MapManager : MonoBehaviour
     {
         StartCoroutine(GrowCrops());
         StartCoroutine(DayNightCycle());
+
+        playerController = FindObjectOfType<PlayerController>();
     }
 
     // Update is called once per frame
@@ -89,13 +98,13 @@ public class MapManager : MonoBehaviour
 
         return walkingSpeed;
     }
-    public void PlaceSeeds(Vector2 worldPosition)
+    public bool PlaceSeeds(Vector2 worldPosition)
     {
         Vector3Int gridPosition = map.WorldToCell(worldPosition);
         TileBase tile = map.GetTile(gridPosition);
 
         if (tile == null || !behaviourFromTiles[tile].canBeSeeded)
-            return;
+            return false;
 
         if (!Crops.ContainsKey(gridPosition))
         {
@@ -106,7 +115,9 @@ public class MapManager : MonoBehaviour
             Crops.Add(gridPosition, newCrop);
 
             print("new seeds added");
+            return true;
         }
+        return false;
     }
 
     public void PlantSeeds(Vector2 worldPosition)
@@ -140,6 +151,34 @@ public class MapManager : MonoBehaviour
             print("growth speed increased");
         }
     }
+
+    public void Harvest(Vector2 worldPosition)
+    {
+        Vector3Int gridPosition = map.WorldToCell(worldPosition);
+        TileBase tileBase = map.GetTile(gridPosition);
+        TileBase tileDetails = Details.GetTile(gridPosition);
+
+        if (tileBase == null)
+            return;
+
+        if (tileDetails != Seeded && Crops.ContainsKey(gridPosition))
+        {
+            if (Crops[gridPosition].harvest())
+            {
+                /*print("Setting tile at " + gridPosition + " to null");
+                Details.SetTile(gridPosition, null);
+                print("Destroying " + Crops[gridPosition].name);
+                Destroy(Crops[gridPosition]);*/
+
+                Details.SetTile(gridPosition, null);
+                Crops[gridPosition].removeCrop();
+                Crops.Remove(gridPosition);
+
+                playerController.incMoney(4);
+                //print("+2 mullah");
+            }
+        }
+    }
     
     public void UpdateCropTiles(Vector3Int tilePos, TileBase tile)
     {
@@ -163,28 +202,79 @@ public class MapManager : MonoBehaviour
     private IEnumerator DayNightCycle()
     {
         bool DayToNight = true;
+        int maxClockValue = 500;
+        int sunriseTime = (int)(maxClockValue * (nightimePercentage / 2f));
+        int sunsetTime = (int)(maxClockValue - maxClockValue * (nightimePercentage  / 2f));
+        int time = maxClockValue / 2;
         while (true)
         {
-            switch (DayToNight)
+            // Loop time 0 - 100
+            // Using a value to determine sunset and sunrise and another value for sunset/rise duration until max/min darkness is reached
+            
+            print(time.ToString());
+
+            if (time == sunriseTime)
             {
-                case true:
+                // initiate sunrise
+                StartCoroutine(SunriseCoroutine(true));
+            }
+            else if (time == sunsetTime)
+            {
+                // initiate sunset
+                StartCoroutine(SunriseCoroutine(false));
+            }
+
+            // adjust clock hand
+            clockHand.transform.eulerAngles = new Vector3(
+                clockHand.transform.eulerAngles.x,
+                clockHand.transform.eulerAngles.y,
+                136.8f - ((360f / (float)maxClockValue) * (float)time)
+                );
+
+
+            // Start the clock over at midnight
+            if (time >= maxClockValue - 1)
+            {
+                time = 0;
+            }
+            // Increment the time
+            else
+            {
+                time++;
+            }
+
+            yield return new WaitForSeconds(DayNightInterval);
+        }
+    }
+
+    private IEnumerator SunriseCoroutine(bool RiseSetBool = false)
+    {
+        while (true)
+        {
+            switch (RiseSetBool)
+            {
+                // Increase alpha during sunset
+                case false:
+                    print("sun is setting");
                     DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a + DayNightAlphaGradient);
                     if (DayNightOverlay.color.a >= DayNightAlphaMax)
                     {
-                        DayToNight = false;
+                        yield break;
                     }
                 break;
 
-                case false:
+                // Decrease alpha during sunrise
+                case true:
+                    print("sun is rising");
                     DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a - DayNightAlphaGradient);
                     if (DayNightOverlay.color.a <= DayNightAlphaMin)
                     {
-                        DayToNight = true;
+                        yield break;
                     }
                     break;
             }
 
-            yield return new WaitForSeconds(DayNightInterval);
+            yield return new WaitForSeconds(0.05f);
         }
     }
 }

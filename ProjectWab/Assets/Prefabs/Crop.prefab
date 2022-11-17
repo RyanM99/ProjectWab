@@ -43,10 +43,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c15848ecb4beaf846b9c2038f4264a2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GrowthTime: 10
+  GrowthTime: 30
   tilePos: {x: 0, y: 0, z: 0}
   currentStage: 0
   stage0: {fileID: 11400000, guid: 5bff66c1656d74a4ea3f05b52a3d24bb, type: 2}
   stage1: {fileID: 11400000, guid: 5c4fcd553a201bf4c8804258cff481fa, type: 2}
   stage2: {fileID: 11400000, guid: 9507d3752ba3860418efc0a3653b8144, type: 2}
   stage3: {fileID: 11400000, guid: 9f794eed92dfac54aa4d719f4761b996, type: 2}
+  fruitedTile: {fileID: 11400000, guid: 3eacc09c7c7a74d4ea6d58dc9419610f, type: 2}
+  growthFactor: 1
+  hasBeenPlanted: 0
