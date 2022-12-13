@@ -26,6 +26,8 @@ public class CropManager : MonoBehaviour
 
     BoxCollider2D boxCollider;
 
+    GameObject ThisCrop;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -122,6 +124,6 @@ public class CropManager : MonoBehaviour
     public void removeCrop()
     {
         this.gameObject.layer = LayerMask.NameToLayer("Default");
-        Destroy(this);
+        Destroy(this.gameObject);
     }
 }

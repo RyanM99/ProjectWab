@@ -30,6 +30,7 @@ public class MapManager : MonoBehaviour
     public CropManager CropPrefab;
     public float GrowthInterval = 1f;
     private Dictionary<Vector3Int, CropManager> Crops = new Dictionary<Vector3Int, CropManager>();
+    public ParticleSystem coinParticlePrefab;
 
 
     // Day Night Cycle
@@ -114,7 +115,7 @@ public class MapManager : MonoBehaviour
             newCrop.SetCollider();
             Crops.Add(gridPosition, newCrop);
 
-            print("new seeds added");
+            //print("new seeds added");
             return true;
         }
         return false;
@@ -165,17 +166,17 @@ public class MapManager : MonoBehaviour
         {
             if (Crops[gridPosition].harvest())
             {
-                /*print("Setting tile at " + gridPosition + " to null");
-                Details.SetTile(gridPosition, null);
-                print("Destroying " + Crops[gridPosition].name);
-                Destroy(Crops[gridPosition]);*/
-
+                // Remove the crop
                 Details.SetTile(gridPosition, null);
                 Crops[gridPosition].removeCrop();
                 Crops.Remove(gridPosition);
 
+                // Play Coin Particles at gridPosition
+                ParticleSystem coins = Instantiate(coinParticlePrefab);
+                coins.transform.position = new Vector3(gridPosition.x + 0.5f, gridPosition.y + 0.5f, 0f);
+
+                // Reward player money
                 playerController.incMoney(4);
-                //print("+2 mullah");
             }
         }
     }
@@ -211,7 +212,7 @@ public class MapManager : MonoBehaviour
             // Loop time 0 - 100
             // Using a value to determine sunset and sunrise and another value for sunset/rise duration until max/min darkness is reached
             
-            print(time.ToString());
+            //print(time.ToString());
 
             if (time == sunriseTime)
             {
@@ -255,7 +256,7 @@ public class MapManager : MonoBehaviour
             {
                 // Increase alpha during sunset
                 case false:
-                    print("sun is setting");
+                    //print("sun is setting");
                     DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a + DayNightAlphaGradient);
                     if (DayNightOverlay.color.a >= DayNightAlphaMax)
                     {
@@ -265,7 +266,7 @@ public class MapManager : MonoBehaviour
 
                 // Decrease alpha during sunrise
                 case true:
-                    print("sun is rising");
+                    //print("sun is rising");
                     DayNightOverlay.color = new Color(DayNightOverlay.color.r, DayNightOverlay.color.g, DayNightOverlay.color.b, DayNightOverlay.color.a - DayNightAlphaGradient);
                     if (DayNightOverlay.color.a <= DayNightAlphaMin)
                     {
